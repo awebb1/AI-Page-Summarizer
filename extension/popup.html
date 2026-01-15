@@ -91,7 +91,7 @@
       color: #a1a1aa;
     }
     
-    input, select {
+    input, select, textarea {
       width: 100%;
       padding: 10px 12px;
       border: 1px solid #3f3f46;
@@ -99,14 +99,21 @@
       background: #27272a;
       color: #e4e4e7;
       font-size: 13px;
+      font-family: inherit;
     }
     
-    input:focus, select:focus {
+    textarea {
+      resize: vertical;
+      min-height: 200px;
+      line-height: 1.5;
+    }
+    
+    input:focus, select:focus, textarea:focus {
       outline: none;
       border-color: #8b5cf6;
     }
     
-    input::placeholder {
+    input::placeholder, textarea::placeholder {
       color: #71717a;
     }
     
@@ -343,6 +350,7 @@
     <button class="tab active" data-tab="sites">Sites</button>
     <button class="tab" data-tab="mode">Mode</button>
     <button class="tab" data-tab="folders">Folders</button>
+    <button class="tab" data-tab="prompt">Prompt</button>
     <button class="tab" data-tab="settings">Settings</button>
   </div>
   
@@ -496,6 +504,24 @@
         <button id="resetStatsBtn" class="secondary" style="margin-top: 8px; width: 100%;">Reset Statistics</button>
       </div>
     </div>
+  </div>
+  
+  <!-- Prompt Tab -->
+  <div id="prompt-tab" class="tab-content">
+    <div class="form-group">
+      <label>Custom AI Prompt</label>
+      <textarea id="customPrompt" rows="12" placeholder="Enter your custom prompt..."></textarea>
+      <div class="help-text">
+        Variables: <code class="theme-text">{title}</code> <code class="theme-text">{url}</code> <code class="theme-text">{hostname}</code> <code class="theme-text">{content}</code> <code class="theme-text">{images}</code>
+      </div>
+    </div>
+    
+    <div style="display: flex; gap: 8px;">
+      <button id="savePromptBtn" style="flex: 1;">Save Prompt</button>
+      <button id="resetPromptBtn" class="secondary" style="flex: 1;">Reset to Default</button>
+    </div>
+    
+    <div id="promptStatus" class="status" style="display: none;"></div>
   </div>
   
   <!-- Folders Tab -->

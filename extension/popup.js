@@ -696,6 +696,71 @@ document.getElementById('saveFolderBtn').addEventListener('click', async () => {
   showStatus('folderStatus', `Folder set: ${folderPath || 'Vault Root'}`, 'success');
 });
 
+// ============ PROMPT TAB ============
+
+const DEFAULT_PROMPT = `You are creating concise study notes from a webpage. Summarize the following page into well-structured Markdown notes.
+
+Requirements:
+- Use clear headings and subheadings
+- Include key concepts, definitions, and important points
+- Use bullet points and numbered lists where appropriate
+- Use tables for comparisons if relevant
+- Include code blocks for any code snippets
+- Reference important images using markdown syntax with their URLs
+- Keep it concise but comprehensive
+- Add a "Key Takeaways" section at the end
+- Include the source URL at the bottom
+
+Page Title: {title}
+Page URL: {url}
+Source: {hostname}
+{images}
+
+--- PAGE CONTENT ---
+{content}
+--- END CONTENT ---
+
+Generate the Markdown notes now:`;
+
+async function loadPrompt() {
+  const settings = await chrome.storage.sync.get(['customPrompt']);
+  let prompt = settings.customPrompt || DEFAULT_PROMPT;
+  
+  // Migrate old JavaScript-style variables to user-friendly format
+  if (prompt.includes('${pageData.') || prompt.includes('${imageList}')) {
+    prompt = prompt
+      .replace(/\$\{pageData\.title\}/g, '{title}')
+      .replace(/\$\{pageData\.url\}/g, '{url}')
+      .replace(/\$\{pageData\.textContent\}/g, '{content}')
+      .replace(/\$\{imageList\}/g, '{images}')
+      .replace(/\$\{hostname\}/g, '{hostname}');
+    
+    // Save the migrated prompt
+    await chrome.storage.sync.set({ customPrompt: prompt });
+  }
+  
+  document.getElementById('customPrompt').value = prompt;
+}
+
+document.getElementById('savePromptBtn').addEventListener('click', async () => {
+  const prompt = document.getElementById('customPrompt').value.trim();
+  if (!prompt) {
+    showStatus('promptStatus', 'Prompt cannot be empty', 'error');
+    return;
+  }
+  await chrome.storage.sync.set({ customPrompt: prompt });
+  showStatus('promptStatus', 'Custom prompt saved!', 'success');
+});
+
+document.getElementById('resetPromptBtn').addEventListener('click', async () => {
+  document.getElementById('customPrompt').value = DEFAULT_PROMPT;
+  await chrome.storage.sync.set({ customPrompt: DEFAULT_PROMPT });
+  showStatus('promptStatus', 'Prompt reset to default', 'success');
+});
+
+// Load prompt on init
+loadPrompt();
+
 // ============ MODE TAB ============
 
 function updateStudyOptionsVisibility() {
