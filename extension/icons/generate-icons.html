@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Icon Generator - Page Summarizer</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; background: #18181b; color: white; }
+    canvas { border: 1px solid #3f3f46; margin: 10px; }
+    h1 { color: #a78bfa; }
+    p { color: #a1a1aa; }
+  </style>
+</head>
+<body>
+  <h1>Page Summarizer - Icon Generator</h1>
+  <p>Right-click each canvas and "Save image as..." with the filename shown:</p>
+  
+  <div id="icons"></div>
+  
+  <script>
+    const sizes = [16, 48, 128];
+    const container = document.getElementById('icons');
+    
+    function drawIcon(ctx, size) {
+      // Background gradient
+      const gradient = ctx.createLinearGradient(0, 0, size, size);
+      gradient.addColorStop(0, '#8b5cf6');
+      gradient.addColorStop(1, '#a78bfa');
+      
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.roundRect(0, 0, size, size, size * 0.15);
+      ctx.fill();
+      
+      // Document icon
+      const padding = size * 0.2;
+      const docWidth = size * 0.5;
+      const docHeight = size * 0.6;
+      const docX = (size - docWidth) / 2;
+      const docY = (size - docHeight) / 2;
+      
+      ctx.fillStyle = 'white';
+      ctx.beginPath();
+      ctx.roundRect(docX, docY, docWidth, docHeight, size * 0.05);
+      ctx.fill();
+      
+      // Lines on document
+      ctx.fillStyle = '#8b5cf6';
+      const lineHeight = size * 0.04;
+      const lineGap = size * 0.08;
+      const lineX = docX + size * 0.08;
+      const lineWidth = docWidth - size * 0.16;
+      
+      for (let i = 0; i < 3; i++) {
+        const y = docY + size * 0.12 + (i * lineGap);
+        ctx.fillRect(lineX, y, lineWidth * (i === 2 ? 0.6 : 1), lineHeight);
+      }
+    }
+    
+    sizes.forEach(size => {
+      const canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      drawIcon(ctx, size);
+      
+      const label = document.createElement('div');
+      label.innerHTML = `<strong>icon${size}.png</strong> (${size}x${size})`;
+      container.appendChild(label);
+      container.appendChild(canvas);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      width: 360px;
+      height: 500px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #18181b;
+      color: #e4e4e7;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    
+    .header {
+      background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
+      padding: 12px 16px;
+      color: white;
+      flex-shrink: 0;
+    }
+    
+    h1 {
+      font-size: 16px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .tabs {
+      display: flex;
+      gap: 4px;
+      padding: 8px;
+      background: #1f1f23;
+      flex-shrink: 0;
+    }
+    
+    .tab {
+      flex: 1;
+      padding: 8px 12px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      color: #71717a;
+      transition: all 0.2s;
+    }
+    
+    .tab.active {
+      color: white;
+      background: #8b5cf6;
+      border-color: #8b5cf6;
+    }
+    
+    .tab:hover:not(.active) {
+      color: #e4e4e7;
+      background: #27272a;
+    }
+    
+    .tab-content {
+      display: none;
+      padding: 16px;
+      flex: 1;
+      overflow-y: auto;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .form-group {
+      margin-bottom: 14px;
+    }
+    
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      margin-bottom: 6px;
+      color: #a1a1aa;
+    }
+    
+    input, select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #3f3f46;
+      border-radius: 6px;
+      background: #27272a;
+      color: #e4e4e7;
+      font-size: 13px;
+    }
+    
+    input:focus, select:focus {
+      outline: none;
+      border-color: #8b5cf6;
+    }
+    
+    input::placeholder {
+      color: #71717a;
+    }
+    
+    button {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
+      color: white;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    button:hover {
+      opacity: 0.9;
+    }
+    
+    button.secondary {
+      background: #3f3f46;
+    }
+    
+    button.danger {
+      background: #ef4444;
+    }
+    
+    .status {
+      margin-top: 12px;
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      text-align: center;
+    }
+    
+    .status.success {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #10b981;
+    }
+    
+    .status.error {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #ef4444;
+    }
+    
+    .site-list {
+      max-height: 150px;
+      overflow-y: auto;
+      margin-bottom: 12px;
+    }
+    
+    .site-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 10px;
+      background: #27272a;
+      border-radius: 6px;
+      margin-bottom: 6px;
+      font-size: 13px;
+    }
+    
+    .site-item button {
+      width: auto;
+      padding: 4px 8px;
+      font-size: 11px;
+      background: #ef4444;
+    }
+    
+    .current-site {
+      background: #27272a;
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 12px;
+      font-size: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .current-site code {
+      color: var(--theme-color, #a78bfa);
+    }
+    
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    
+    .checkbox-group input[type="checkbox"] {
+      width: auto;
+    }
+    
+    .checkbox-group label {
+      margin: 0;
+      font-size: 13px;
+      color: #e4e4e7;
+    }
+    
+    .help-text {
+      font-size: 11px;
+      color: #71717a;
+      margin-top: 4px;
+    }
+    
+    .help-text code {
+      background: #3f3f46;
+      padding: 2px 5px;
+      border-radius: 3px;
+      font-family: 'Consolas', monospace;
+      color: var(--theme-color, #a78bfa);
+    }
+    
+    .connection-status {
+      padding: 10px;
+      border-radius: 6px;
+      background: #27272a;
+      font-size: 12px;
+      margin-top: 12px;
+    }
+    
+    .connection-status.connected {
+      border-left: 3px solid #10b981;
+    }
+    
+    .connection-status.disconnected {
+      border-left: 3px solid #ef4444;
+    }
+    
+    .folder-select {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    
+    .folder-select select {
+      flex: 1;
+    }
+    
+    .folder-select button {
+      width: auto;
+      padding: 8px 12px;
+      background: #3f3f46;
+    }
+    
+    .study-options {
+      display: none;
+      margin-top: 14px;
+      padding: 14px;
+      background: #1f1f23;
+      border-radius: 8px;
+      border: 1px solid #3f3f46;
+    }
+    
+    .study-options.visible {
+      display: block;
+    }
+    
+    .study-option {
+      margin-bottom: 14px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid #3f3f46;
+    }
+    
+    .study-option:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+    
+    .study-option-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    
+    .study-option-header input[type="checkbox"] {
+      width: auto;
+    }
+    
+    .study-option-header label {
+      margin: 0;
+      font-size: 13px;
+      font-weight: 500;
+      color: #e4e4e7;
+    }
+    
+    .study-option-config {
+      display: none;
+      margin-left: 24px;
+    }
+    
+    .study-option-config.visible {
+      display: block;
+    }
+    
+    .mode-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    
+    .mode-badge.standard {
+      background: #3f3f46;
+      color: #a1a1aa;
+    }
+    
+    .mode-badge.study {
+      background: rgba(139, 92, 246, 0.2);
+      color: var(--theme-color, #a78bfa);
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+      </svg>
+      Page Summarizer
+    </h1>
+  </div>
+  
+  <div class="tabs">
+    <button class="tab active" data-tab="sites">Sites</button>
+    <button class="tab" data-tab="mode">Mode</button>
+    <button class="tab" data-tab="folders">Folders</button>
+    <button class="tab" data-tab="settings">Settings</button>
+  </div>
+  
+  <!-- Sites Tab -->
+  <div id="sites-tab" class="tab-content active">
+    <div class="current-site">
+      <span>Current: <code id="currentSite">-</code></span>
+      <button id="addCurrentSite" style="width: auto; padding: 6px 12px;">+ Add</button>
+    </div>
+    
+    <div class="checkbox-group">
+      <input type="checkbox" id="enableOnAllSites">
+      <label for="enableOnAllSites">Enable on ALL sites</label>
+    </div>
+    
+    <label>Whitelisted Sites</label>
+    <div class="site-list" id="siteList">
+      <div class="site-item" style="color: #71717a;">No sites added yet</div>
+    </div>
+    
+    <div class="form-group">
+      <input type="text" id="newSite" placeholder="example.com or *.example.com">
+    </div>
+    <button id="addSiteBtn" class="secondary">Add Site Manually</button>
+  </div>
+  
+  <!-- Mode Tab -->
+  <div id="mode-tab" class="tab-content">
+    <div class="form-group">
+      <label>Summarization Mode</label>
+      <select id="summaryMode">
+        <option value="standard">📝 Standard - Key takeaways & summary</option>
+        <option value="study">📚 Study - Enhanced learning mode</option>
+      </select>
+      <div class="help-text">Study mode enables cheatsheets and study questions</div>
+    </div>
+    
+    <div id="studyOptions" class="study-options">
+      <div class="study-option">
+        <div class="study-option-header">
+          <input type="checkbox" id="enableCheatsheet">
+          <label for="enableCheatsheet">📋 Cheatsheet</label>
+        </div>
+        <div class="help-text" style="margin-left: 24px; margin-bottom: 10px;">
+          Append key examples & quick references to a master cheatsheet
+        </div>
+        <div id="cheatsheetConfig" class="study-option-config">
+          <label style="font-size: 11px;">Cheatsheet Location</label>
+          <div class="folder-select" style="margin-bottom: 4px;">
+            <select id="cheatsheetFolder" style="flex: 1;">
+              <option value="">📁 Vault Root</option>
+            </select>
+            <button id="refreshCheatsheetFolders" type="button" style="width: auto; padding: 8px 12px; background: #3f3f46;">↻</button>
+          </div>
+          <input type="text" id="cheatsheetFilename" placeholder="Cheatsheet.md" style="margin-bottom: 4px;">
+          <div class="help-text">Folder + filename (file will be created or appended to)</div>
+        </div>
+      </div>
+      
+      <div class="study-option">
+        <div class="study-option-header">
+          <input type="checkbox" id="enableStudyQuestions">
+          <label for="enableStudyQuestions">❓ Study Questions</label>
+        </div>
+        <div class="help-text" style="margin-left: 24px; margin-bottom: 10px;">
+          Generate Q&A with revealable answers for self-testing
+        </div>
+        <div id="studyQuestionsConfig" class="study-option-config">
+          <label style="font-size: 11px;">Study Questions Location</label>
+          <div class="folder-select" style="margin-bottom: 4px;">
+            <select id="studyQuestionsFolder" style="flex: 1;">
+              <option value="">📁 Vault Root</option>
+            </select>
+            <button id="refreshQuestionsFolders" type="button" style="width: auto; padding: 8px 12px; background: #3f3f46;">↻</button>
+          </div>
+          <input type="text" id="studyQuestionsFilename" placeholder="Study-Questions.md" style="margin-bottom: 4px;">
+          <div class="help-text">Folder + filename (file will be created or appended to)</div>
+        </div>
+      </div>
+    </div>
+    
+    <button id="saveModeBtn" style="margin-top: 14px;">Save Mode Settings</button>
+    <div id="modeStatus" class="status" style="display: none;"></div>
+  </div>
+  
+  <!-- Settings Tab -->
+  <div id="settings-tab" class="tab-content">
+    <div class="form-group">
+      <label>AI API Key</label>
+      <input type="password" id="apiKey" placeholder="sk-ant-... (Anthropic) or sk-... (OpenAI)">
+      <div id="detectedProvider" style="margin-top: 6px; font-size: 12px; color: #71717a;">⚪ Enter API key to detect provider</div>
+    </div>
+    
+    <div class="form-group">
+      <label>Model</label>
+      <div style="display: flex; gap: 8px;">
+        <select id="model" style="flex: 1;">
+          <option value="">Loading models...</option>
+        </select>
+        <button id="refreshModels" type="button" style="width: auto; padding: 8px 12px; background: #3f3f46;" title="Refresh model list">↻</button>
+      </div>
+      <div class="help-text" id="modelHelp">Select a model to use for summarization</div>
+    </div>
+    
+    <div class="form-group">
+      <label>Obsidian API Key</label>
+      <input type="password" id="obsidianApiKey" placeholder="From Local REST API plugin">
+      <div class="help-text">Obsidian → Settings → Local REST API</div>
+    </div>
+    
+    <div class="form-group">
+      <label>Theme Color</label>
+      <div style="display: flex; gap: 10px; align-items: center;">
+        <input type="color" id="themeColor" value="#8b5cf6" style="width: 60px; height: 40px; padding: 0; border: none; border-radius: 6px; cursor: pointer; background: none;">
+        <span id="themeColorHex" style="font-family: monospace; color: #a1a1aa; font-size: 12px;">#8b5cf6</span>
+      </div>
+      <div class="help-text">Click to choose any color for the button</div>
+    </div>
+    
+    <div class="form-group">
+      <label>Button Position</label>
+      <button id="resetPositionBtn" class="secondary" type="button">Reset Button Position</button>
+      <div class="help-text">The button can be dragged on the page. Reset here if needed.</div>
+    </div>
+    
+    <div class="form-group">
+      <label>Log Panel Position</label>
+      <button id="resetLogPositionBtn" class="secondary" type="button">Reset Log Position</button>
+      <div class="help-text">The log panel can also be dragged. Reset here if needed.</div>
+    </div>
+    
+    <button id="saveSettingsBtn">Save Settings</button>
+    
+    <div id="settingsStatus" class="status" style="display: none;"></div>
+    
+    <div id="connectionStatus" class="connection-status disconnected">
+      Checking Obsidian...
+    </div>
+    
+    <div class="form-group" style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #3f3f46;">
+      <label>Usage Statistics</label>
+      <div id="usageStats" style="background: #27272a; padding: 12px; border-radius: 6px; font-size: 12px;">
+        <div style="margin-bottom: 8px;">
+          <strong class="theme-text">Last Summarization:</strong>
+          <div id="lastUsage" style="color: #a1a1aa; margin-top: 4px;">-</div>
+        </div>
+        <div>
+          <strong class="theme-text">Total This Session:</strong>
+          <div id="totalUsage" style="color: #a1a1aa; margin-top: 4px;">-</div>
+        </div>
+        <button id="resetStatsBtn" class="secondary" style="margin-top: 8px; width: 100%;">Reset Statistics</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Folders Tab -->
+  <div id="folders-tab" class="tab-content">
+    <div class="form-group">
+      <label>Save to Folder</label>
+      <div class="folder-select">
+        <select id="existingFolder">
+          <option value="">📁 Vault Root</option>
+        </select>
+        <button id="refreshFolders">↻</button>
+      </div>
+      <input type="text" id="folderPath" placeholder="Or type: Notes/Summaries" style="margin-top: 8px;">
+      <div class="help-text">Select existing or type new path (use / for nesting)</div>
+    </div>
+    
+    <button id="saveFolderBtn">Save Folder Setting</button>
+    
+    <div id="folderStatus" class="status" style="display: none;"></div>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>
