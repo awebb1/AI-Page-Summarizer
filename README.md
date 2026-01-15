@@ -10,10 +10,14 @@ A Chrome extension that summarizes any webpage using AI and saves the notes dire
 
 - 🎯 **One-Click Summarize** - Floating button appears on whitelisted sites
 - 🌐 **Any Website** - Whitelist specific sites or enable on ALL sites
-- 🤖 **AI-Powered** - Uses Claude (Anthropic) or GPT-4 (OpenAI)
+- 🤖 **AI-Powered** - Uses Claude (Anthropic) or GPT (OpenAI) with dynamic model selection
 - 📁 **Direct to Obsidian** - Saves notes via Obsidian's Local REST API
-- 📋 **Progress Log** - See exactly what's happening during summarization
-- 🎨 **Smart Extraction** - Automatically finds main content, ignores navigation
+- 📋 **Progress Log** - Draggable log panel shows real-time progress
+- 🎨 **Customizable Theme** - Pick any color for the button and UI
+- 📚 **Study Mode** - Generate cheatsheets and study questions with revealable answers
+- 💰 **Cost Tracking** - See token usage and estimated costs per summarization
+- ✏️ **Custom Prompts** - Modify the AI prompt to suit your needs
+- 🔄 **Draggable UI** - Button and log panel can be dragged anywhere on the page
 
 ## 📦 Installation
 
@@ -37,9 +41,9 @@ A Chrome extension that summarizes any webpage using AI and saves the notes dire
 
 1. Click the extension icon in Chrome
 2. Go to the **Settings** tab:
-   - Choose AI Provider (Anthropic or OpenAI)
-   - Enter your AI API key
+   - Enter your AI API key (Anthropic or OpenAI - auto-detected)
    - Enter your Obsidian API key
+   - Choose your preferred theme color
 3. Go to the **Folders** tab:
    - Select or type where to save notes
 4. Go to the **Sites** tab:
@@ -48,9 +52,33 @@ A Chrome extension that summarizes any webpage using AI and saves the notes dire
 ## 🚀 Usage
 
 1. Navigate to any whitelisted webpage
-2. Click the purple **Summarize** button (top-right corner)
-3. Watch the progress log
-4. Notes appear in Obsidian automatically!
+2. Hover over the floating button (bottom-right by default)
+3. Click **Summarize**
+4. Watch the progress in the draggable log panel
+5. Notes appear in Obsidian automatically!
+
+### Button Behavior
+- The button stays tucked away (small, low opacity) until you hover over it
+- Drag the button anywhere on the page - position is saved
+- Drag the log panel by its header to reposition it
+
+## 📚 Summarization Modes
+
+### Standard Mode
+Creates a comprehensive summary with key takeaways.
+
+### Study Mode
+Enhanced mode for learning, with two optional features:
+
+#### 📝 Cheatsheet
+- Extracts key concepts, important examples, and AI-generated insights
+- Appends to a single file (e.g., `Cheatsheet.md`) across multiple pages
+- Each page entry is collapsible with source links
+
+#### ❓ Study Questions
+- Generates quiz questions based on the content
+- Answers are hidden using Obsidian callout syntax (click to reveal)
+- Appends to a single file for comprehensive review
 
 ## ⚙️ Settings
 
@@ -60,20 +88,34 @@ A Chrome extension that summarizes any webpage using AI and saves the notes dire
 - **Manual add** - Add domains like `example.com` or wildcards like `*.example.com`
 
 ### Settings Tab
-- **AI Provider** - Choose between Anthropic (Claude) or OpenAI (GPT-4)
-- **AI API Key** - Your API key for the chosen provider
+- **AI API Key** - Your Anthropic or OpenAI API key (provider auto-detected)
+- **AI Model** - Dynamically fetched from your API provider
 - **Obsidian API Key** - From Obsidian's Local REST API plugin
+- **Theme Color** - Pick any color for the button and UI accents
+- **Reset Positions** - Reset button and log panel to default positions
 
 ### Folders Tab
-- **Select existing folder** - Choose from your vault's folders
+- **Select existing folder** - Choose from your vault's folders (nested up to 4 levels)
 - **Type new path** - Create new folder structure like `Notes/Summaries`
 - **Vault Root** - Save directly to the vault root
 
+### Mode Tab
+- **Standard/Study** - Choose summarization mode
+- **Cheatsheet** - Enable and configure cheatsheet file location
+- **Study Questions** - Enable and configure study questions file location
+
+### Prompt Tab
+- **Custom Prompt** - Edit the AI prompt template
+- **Variables** - Use `{title}`, `{url}`, `{content}` placeholders
+- **Reset** - Restore the default prompt
+
 ## 💰 API Costs
 
-Approximate costs per page summary:
-- **Anthropic (Claude)**: ~$0.003-0.01
-- **OpenAI (GPT-4o)**: ~$0.005-0.02
+The extension tracks and displays costs per summarization. Approximate costs:
+- **Anthropic (Claude Sonnet)**: ~$0.003-0.01 per page
+- **OpenAI (GPT-4o)**: ~$0.005-0.02 per page
+
+Costs vary based on page length and model selected. Study mode with cheatsheet and questions enabled will use 3x the tokens (3 separate API calls).
 
 ## 🔧 Troubleshooting
 
@@ -92,6 +134,11 @@ Approximate costs per page summary:
 - Make sure you have API credits
 - Check the browser console for errors
 
+### Models not loading
+- Verify your API key is correct
+- Check your internet connection
+- The extension fetches models directly from Anthropic/OpenAI APIs
+
 ## 🏗️ Project Structure
 
 ```
@@ -102,8 +149,8 @@ page-summarizer/
 │   ├── content.js        # Button injection & page extraction
 │   ├── popup.html        # Settings UI
 │   ├── popup.js          # Settings logic
-│   ├── styles.css        # Button & log styling
-│   └── icons/            # Extension icons
+│   └── styles.css        # Button & log styling
+├── LICENSE
 └── README.md
 ```
 
