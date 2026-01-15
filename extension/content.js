@@ -432,9 +432,9 @@ async function handleSummarize() {
     // Show usage info
     if (response.usage) {
       const tokens = (response.usage.tokens || 0).toLocaleString();
-      if (response.usage.cost !== null && response.usage.cost !== undefined) {
+      if (response.usage.cost !== null && response.usage.cost !== undefined && response.usage.cost > 0) {
         const cost = response.usage.cost.toFixed(4);
-        addLog(`Cost: $${cost} (${tokens} tokens)`, 'info');
+        addLog(`Est. Cost: ~$${cost} (${tokens} tokens)`, 'success');
       } else {
         addLog(`Tokens used: ${tokens}`, 'info');
       }

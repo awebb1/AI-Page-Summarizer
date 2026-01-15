@@ -274,8 +274,56 @@ ${content}
 
 // ============ USAGE TRACKING ============
 
+// Estimate cost based on model (per 1M tokens pricing, converted to per-token)
+function estimateCost(provider, model, inputTokens, outputTokens) {
+  const modelLower = model.toLowerCase();
+  
+  // Pricing per 1M tokens (input, output) - estimates based on current rates
+  let inputRate = 0;
+  let outputRate = 0;
+  
+  if (provider === 'anthropic') {
+    if (modelLower.includes('opus')) {
+      inputRate = 15.00; outputRate = 75.00;
+    } else if (modelLower.includes('sonnet')) {
+      inputRate = 3.00; outputRate = 15.00;
+    } else if (modelLower.includes('haiku')) {
+      inputRate = 0.25; outputRate = 1.25;
+    } else {
+      // Default to Sonnet pricing
+      inputRate = 3.00; outputRate = 15.00;
+    }
+  } else if (provider === 'openai') {
+    if (modelLower.includes('gpt-4o-mini')) {
+      inputRate = 0.15; outputRate = 0.60;
+    } else if (modelLower.includes('gpt-4o')) {
+      inputRate = 2.50; outputRate = 10.00;
+    } else if (modelLower.includes('gpt-4-turbo') || modelLower.includes('gpt-4-1')) {
+      inputRate = 10.00; outputRate = 30.00;
+    } else if (modelLower.includes('gpt-4')) {
+      inputRate = 30.00; outputRate = 60.00;
+    } else if (modelLower.includes('gpt-3.5')) {
+      inputRate = 0.50; outputRate = 1.50;
+    } else if (modelLower.includes('o1-mini')) {
+      inputRate = 3.00; outputRate = 12.00;
+    } else if (modelLower.includes('o1')) {
+      inputRate = 15.00; outputRate = 60.00;
+    } else {
+      // Default to GPT-4o pricing
+      inputRate = 2.50; outputRate = 10.00;
+    }
+  }
+  
+  // Convert from per-1M to actual cost
+  const inputCost = (inputTokens / 1000000) * inputRate;
+  const outputCost = (outputTokens / 1000000) * outputRate;
+  
+  return inputCost + outputCost;
+}
+
 async function trackUsage(provider, model, inputTokens, outputTokens) {
   const totalTokens = inputTokens + outputTokens;
+  const cost = estimateCost(provider, model, inputTokens, outputTokens);
   
   const usageData = {
     provider,
@@ -283,14 +331,15 @@ async function trackUsage(provider, model, inputTokens, outputTokens) {
     inputTokens,
     outputTokens,
     totalTokens,
-    cost: null,
+    cost,
     timestamp: Date.now()
   };
   
-  const totals = await chrome.storage.local.get(['totalTokens']);
+  const totals = await chrome.storage.local.get(['totalTokens', 'totalCost']);
   await chrome.storage.local.set({ 
     lastUsage: usageData,
-    totalTokens: (totals.totalTokens || 0) + totalTokens
+    totalTokens: (totals.totalTokens || 0) + totalTokens,
+    totalCost: (totals.totalCost || 0) + cost
   });
   
   return usageData;

@@ -397,11 +397,13 @@ async function loadUsageStats() {
     const date = new Date(usage.timestamp).toLocaleString();
     // Show full model name, just remove date suffix if present (e.g., -20250514)
     const modelName = usage.model ? usage.model.replace(/-\d{8}$/, '') : 'Unknown';
-    const costDisplay = usage.cost !== null && usage.cost !== undefined 
-      ? `$${usage.cost.toFixed(4)} • `
-      : '';
+    
+    // Always show cost (0 if not available)
+    const cost = usage.cost || 0;
+    const costDisplay = `<strong style="color: #10b981;">~$${cost.toFixed(4)}</strong>`;
+    
     document.getElementById('lastUsage').innerHTML = `
-      ${costDisplay}${tokens} tokens<br>
+      ${costDisplay} • ${tokens} tokens<br>
       <span class="theme-text" style="font-size: 11px;">${modelName}</span><br>
       <span style="font-size: 11px; color: #71717a;">${date}</span>
     `;
@@ -413,14 +415,10 @@ async function loadUsageStats() {
   const totalCost = totals.totalCost || 0;
   const totalTokens = totals.totalTokens || 0;
   
-  if (totalTokens > 0) {
-    const costDisplay = totalCost > 0 ? `$${totalCost.toFixed(4)} • ` : '';
-    document.getElementById('totalUsage').innerHTML = `
-      ${costDisplay}${totalTokens.toLocaleString()} tokens
-    `;
-  } else {
-    document.getElementById('totalUsage').textContent = '0 tokens';
-  }
+  const costDisplay = `<strong style="color: #10b981;">~$${totalCost.toFixed(4)}</strong>`;
+  document.getElementById('totalUsage').innerHTML = `
+    ${costDisplay} • ${totalTokens.toLocaleString()} tokens
+  `;
 }
 
 document.getElementById('resetStatsBtn').addEventListener('click', async () => {
