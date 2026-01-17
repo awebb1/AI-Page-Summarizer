@@ -1,3 +1,52 @@
+// Check Obsidian connection status
+async function checkObsidianConnection() {
+  const urls = [
+    'https://127.0.0.1:27124/',
+    'http://127.0.0.1:27123/'
+  ];
+  
+  for (const url of urls) {
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        signal: AbortSignal.timeout(2000)
+      });
+      
+      if (response.ok || response.status === 401) {
+        return true;
+      }
+    } catch (e) {
+      continue;
+    }
+  }
+  
+  return false;
+}
+
+// Update button state based on Obsidian connection
+async function updateButtonConnectionState() {
+  const button = document.getElementById('page-summarizer-btn');
+  if (!button) return;
+  
+  const isConnected = await checkObsidianConnection();
+  const settings = await chrome.storage.sync.get(['obsidianApiKey']);
+  const hasApiKey = !!settings.obsidianApiKey;
+  
+  if (isConnected && hasApiKey) {
+    button.disabled = false;
+    button.classList.remove('disabled');
+    button.title = 'Summarize this page';
+  } else {
+    button.disabled = true;
+    button.classList.add('disabled');
+    if (!hasApiKey) {
+      button.title = 'Obsidian API key not configured - open extension settings';
+    } else {
+      button.title = 'Obsidian not connected - ensure Local REST API plugin is running';
+    }
+  }
+}
+
 // Check if current site is whitelisted before injecting button
 async function checkAndInject() {
   const settings = await chrome.storage.sync.get(['whitelistedSites', 'enableOnAllSites']);
@@ -54,6 +103,11 @@ async function injectButton() {
     <span>Summarize</span>
   `;
   
+  // Start disabled until connection is verified
+  button.disabled = true;
+  button.classList.add('disabled');
+  button.title = 'Checking Obsidian connection...';
+  
   // Start in tucked state
   button.classList.add('tucked');
   
@@ -70,6 +124,12 @@ async function injectButton() {
   
   button.addEventListener('click', handleSummarize);
   document.body.appendChild(button);
+  
+  // Check Obsidian connection and update button state
+  updateButtonConnectionState();
+  
+  // Periodically check connection (every 10 seconds)
+  setInterval(updateButtonConnectionState, 10000);
 }
 
 // Apply theme color to CSS variables
@@ -362,8 +422,12 @@ function extractPageContent() {
 async function handleSummarize() {
   const button = document.getElementById('page-summarizer-btn');
   
-  // Check if already processing
+  // Check if already processing or disabled
   if (button.classList.contains('loading')) return;
+  if (button.disabled || button.classList.contains('disabled')) {
+    showToast('Obsidian not connected. Check extension settings.', 'error');
+    return;
+  }
   
   // Show log panel
   createLogPanel();
@@ -397,6 +461,15 @@ async function handleSummarize() {
     }
     
     addLog('Settings loaded ✓', 'success');
+    
+    // Verify Obsidian connection before proceeding
+    addLog('Verifying Obsidian connection...', 'working');
+    const isConnected = await checkObsidianConnection();
+    if (!isConnected) {
+      throw new Error('Obsidian not connected. Please ensure Obsidian is running with the Local REST API plugin.');
+    }
+    addLog('Obsidian connected ✓', 'success');
+    
     addLog('Extracting page content...', 'working');
     
     // Extract page content

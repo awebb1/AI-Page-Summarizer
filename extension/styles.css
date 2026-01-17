@@ -74,6 +74,22 @@
   transition: none;
 }
 
+/* Disabled state (no Obsidian connection) */
+#page-summarizer-btn.disabled,
+#page-summarizer-btn:disabled {
+  background: linear-gradient(135deg, #4a4a4a 0%, #6b6b6b 100%);
+  cursor: not-allowed;
+  opacity: 0.5;
+  box-shadow: none;
+}
+
+#page-summarizer-btn.disabled:hover,
+#page-summarizer-btn:disabled:hover {
+  transform: none;
+  box-shadow: none;
+  opacity: 0.5;
+}
+
 #page-summarizer-btn.loading {
   background: linear-gradient(135deg, #6b7280 0%, #9ca3af 100%);
   cursor: wait;
